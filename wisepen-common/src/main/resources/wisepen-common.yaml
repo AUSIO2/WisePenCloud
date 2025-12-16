@@ -1,0 +1,4 @@
+logging:
+  pattern:
+    # 🔥 核心：在日志中显式提取 MDC 里的 trace_id 和 span_id
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [traceId=%X{trace_id} spanId=%X{span_id}] %logger{36} - %msg%n"
