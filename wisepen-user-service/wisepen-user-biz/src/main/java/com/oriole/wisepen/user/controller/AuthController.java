@@ -22,4 +22,7 @@ public class AuthController {
     public R<Void> logout() {
         return authService.logout();
     }
+
+    @PostMapping("/register")
+    public R<String> register(@RequestBody LoginBody loginBody) {}
 }
