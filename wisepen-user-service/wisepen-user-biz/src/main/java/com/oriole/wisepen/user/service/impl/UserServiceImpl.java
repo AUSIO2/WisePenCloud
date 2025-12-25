@@ -3,6 +3,7 @@ package com.oriole.wisepen.user.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.oriole.wisepen.user.api.domain.dto.UserInfoDTO;
 import com.oriole.wisepen.user.domain.entity.User;
 import com.oriole.wisepen.user.domain.entity.UserProfile;
@@ -11,10 +12,11 @@ import com.oriole.wisepen.user.mapper.UserMapper;
 import com.oriole.wisepen.user.mapper.UserProfileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
@@ -54,4 +56,52 @@ public class UserServiceImpl implements UserService {
         user.setStatus(status);
         userMapper.updateById(user);
     }
+
+    @Override//联合查询
+    public User getUserCoreInfoByAccount(String account) {
+        return userMapper.selectUserByAccount(account);
+    }
+
+    @Override
+    public boolean verifyExistCampusNum(String campusNum) {
+        return userMapper.verifyExistCampusNum(campusNum)>0;
+    }
+
+    @Override
+    public boolean verifyExistUsername(String username) {
+        return userMapper.verifyExistUsername(username)>0;
+    }
+
+    @Override
+    public Long getUserIdByCampusNum(String campusNum){
+        return userProfileMapper.getUserIdByCampusNum(campusNum);
+    }
+
+    @Override
+    public String getUserEmailByCampusNum(String campusNum){
+        return userMapper.getUserEmailByCampusNum(campusNum);
+    }
+    /**
+     * 插入用户基本信息到sys_user表
+     * @param user 用户实体对象
+     * @return 是否插入成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean insertUser(User user) {
+        return this.save(user);
+    }
+
+    /**
+     * 插入用户档案信息到sys_user_profile表
+     * @param userProfile 用户档案实体对象
+     * @return 是否插入成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean insertUserProfile(UserProfile userProfile) {
+        return userProfileMapper.insert(userProfile) > 0;
+    }
+
+
 }

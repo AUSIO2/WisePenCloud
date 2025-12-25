@@ -6,9 +6,14 @@ import cn.dev33.satoken.exception.NotRoleException;
 import com.oriole.wisepen.common.core.domain.R;
 import com.oriole.wisepen.common.core.domain.enums.ResultCode;
 import com.oriole.wisepen.common.core.exception.ServiceException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.List;
 
 @Slf4j
 @RestControllerAdvice // 拦截所有 Controller
@@ -50,6 +55,33 @@ public class GlobalExceptionHandler {
         log.warn("角色不符: {}", e.getMessage());
         return R.fail(ResultCode.NO_ROLE);
     }
+    /**
+     * 捕获 Bean Validation 参数校验异常（@Valid注解校验失败）
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        // 获取所有字段错误
+        List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
+        StringBuilder errorMsg = new StringBuilder();
+        for (FieldError error : fieldErrors) {
+            errorMsg.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; ");
+        }
+        String message = errorMsg.toString();
+        log.warn("参数校验失败: {}", message);
+        return R.fail(ResultCode.PARAM_ERROR.getCode(), message);
+    }
+
+    /**
+     * 捕获 ConstraintViolationException 异常（方法参数校验失败）
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public R<Void> handleConstraintViolationException(ConstraintViolationException e) {
+        // 获取第一个违反的约束信息
+        ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+        String message = violation.getMessage();
+        log.warn("参数校验失败: {}", message);
+        return R.fail(ResultCode.PARAM_ERROR.getCode(), message);
+    }
 
     /**
      * 兜底异常，防止未知的空指针等错误直接把堆栈暴露给前端
@@ -57,6 +89,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public R<Void> handleException(Exception e) {
         log.error("系统未知错误", e);
-        return R.fail(ResultCode.SYSTEM_ERROR);
+        // 开发模式下返回更详细的错误信息
+        String errorMessage = e.getClass().getSimpleName() + ": " + (e.getMessage() != null ? e.getMessage() : "无详细错误信息");
+        return R.fail(ResultCode.SYSTEM_ERROR.getCode(), errorMessage);
     }
+    //@ExceptionHandler()
 }

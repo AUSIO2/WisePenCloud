@@ -22,8 +22,17 @@ public enum ResultCode implements IErrorCode {
 
     // 用户/认证模块 (1000-1999)
     USER_NOT_EXIST(1001, "用户不存在"),
-    USER_PASSWORD_ERROR(1002, "账号或密码错误"),
-    USER_LOCKED(1003, "账号已被冻结");
+    USER_PASSWORD_ERROR(1002, "用户名或密码错误"),
+    USER_LOCKED(1003, "账号已禁用"),
+    USERNAME_EXISTED(1004,"用户名已被占用"),
+    USER_CAMPUS_NUM_EXISTED(1005,"该学号已注册，请通过找回密码找回"),
+    //校验内容不合法(1300-1399)
+    EMPTY(1300,"缺少必填内容"),
+    USERNAME_INVALID(1301,"用户名必须是4-20位字母、数字或下划线"),
+    PASSWORD_INVALID(1302,"密码长度必须大于8位且包含字母和数字"),
+    CAMPUS_NO_INVALID(1303,"学工号格式不正确");
+
+
 
     // 业务模块 (2000-2999)
     // ..暂无

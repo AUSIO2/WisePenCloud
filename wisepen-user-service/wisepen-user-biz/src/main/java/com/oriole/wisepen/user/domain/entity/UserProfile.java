@@ -1,10 +1,9 @@
 package com.oriole.wisepen.user.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.oriole.wisepen.user.api.enums.DegreeLevel;
-import com.oriole.wisepen.user.api.enums.GenderType;
 import lombok.Data;
 
 import java.io.Serial;
@@ -24,17 +23,27 @@ public class UserProfile implements Serializable {
     private Long userId;
 
     private String realName;
+
+    @TableField("campus_no")
     private String campusNo;
 
-    private GenderType sex;
+    @TableField("sex")
+    private Integer sex;
 
     private String university;
     private String college;
 
     private String major;
-    private String className;
-    private Integer enrollmentYear;
-    private DegreeLevel degreeLevel;
 
+    @TableField("class_name")
+    private String className;
+
+    @TableField("enrollment_year")
+    private Integer enrollmentYear;
+
+    @TableField("degree_level")
+    private Integer degreeLevel;
+
+    @TableField("academic_title")
     private String academicTitle;
 }
